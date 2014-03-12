@@ -1,5 +1,6 @@
 require "ruby-lz4/version"
 require 'stringio'
+require 'cyclicbuffer'
 
 module LZ4
 
@@ -20,28 +21,46 @@ module LZ4
   class LZ4Uncompress
     @@states = [:token, :litlen, :lits, :offset, :matchlen]
 
-    def initialize input, output
-      @input = input
+    def initialize output
+      @buffer = CyclicBuffer.new(2**16)
       @output = output
     end
 
-    def uncompress
+    def uncompress input
 
       while true
-        token = @input.readbyte
+        token = input.readbyte
         litlen = (token & 0xF0) >> 4
         matchlen = (token & 0x0F)
         if litlen == 15
           begin
-            byte = @input.readbyte
+            byte = input.readbyte
             litlen += byte
           end while byte == 255
         end
+        litlen.times do
+          byte = input.readbyte
+          @buffer.write(byte)
+          @output.write(byte.chr("ASCII-8BIT"))
+        end
 
+        break if input.eof?
 
+        offset = input.readbyte + (256*input.readbyte)
 
+        if matchlen == 15
+          begin
+            byte = input.readbyte
+            matchlen += byte
+          end while byte == 255
+        end
+
+        match = @buffer.reference(-offset, matchlen + 4)
+        @buffer.write(*match)
+        @output.write(match.pack("C*"))
+
+        break if input.eof?
       end
-
     end
   end
 
@@ -75,15 +94,18 @@ private
     output = StringIO.new("", "wb")
     LZ4._encode_header(input.size, output)
 
-    lz4 = lz4cls.new input, output
+    lz4 = lz4cls.new output
+    lz4.compress input
+    output.string
   end
 
   def LZ4._uncompress input, lz4cls
     output = StringIO.new("", "wb")
     length = LZ4._decode_header(input)
 
-    lz4 = lz4cls.new input, output
-    lz4.uncompress
+    lz4 = lz4cls.new output
+    lz4.uncompress input
+    output.string
   end
 
   def LZ4._encode_header length, output
