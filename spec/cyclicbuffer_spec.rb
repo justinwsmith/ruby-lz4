@@ -8,6 +8,47 @@ require 'cyclicbuffer'
 
   describe cls do
 
+    it "should tell its size" do
+      cb = cls.new 5
+      cb.size.should eq(5)
+      cb.length.should eq(5)
+    end
+
+    it "should tell its absolute position" do
+      cb = cls.new 3
+      ary = [4, 5, 6]
+      cb.write *ary
+      cb.last.should eq(2)
+      cb.write 7
+      cb.last.should eq(0)
+    end
+
+    it "should permit absolute position references" do
+      cb = cls.new 3
+      ary = [4, 5, 6]
+      cb.write *ary
+      cb.absolute(0, 3).should eq(ary)
+      cb.write 7
+      cb.absolute(0, 3).should eq([7] * 3)
+      cb.absolute(1, 3).should eq([5, 6, 7])
+      cb.absolute(2, 3).should eq([6, 7, 6])
+    end
+
+    it "should raise error on invalid absolute reference" do
+      cb = cls.new 5
+      ary = [4, 5, 6]
+      cb.write *ary
+      expect { cb.absolute(3, 3) }.to raise_error
+    end
+
+    it "should raise error on invalid relative reference" do
+      cb = cls.new 5
+      ary = [4, 5, 6]
+      cb.write *ary
+      expect { cb.relative(3, 3) }.to raise_error
+      expect { cb.relative(-4, 3) }.to raise_error
+    end
+
     it "should allow relative to previous written values" do
       cb = cls.new 4
       cb.write 1, 2, 3

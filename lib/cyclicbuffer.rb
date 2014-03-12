@@ -31,7 +31,7 @@ class CyclicBuffer
 
   def absolute pos, length = 1
 
-    if pos < 0 || pos >= size || (pos >= @next && !cycling)
+    if pos < 0 || pos >= size || (pos >= @next && !@cycling)
       raise "Pos #{pos} -- invalid absolute position"
     end
 
