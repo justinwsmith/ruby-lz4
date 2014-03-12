@@ -56,7 +56,7 @@ module LZ4
           end while byte == 255
         end
 
-        match = @buffer.reference(-offset, matchlen + 4)
+        match = @buffer.relative(-offset, matchlen + 4)
         @buffer.write(*match)
         @output.write(match.pack("C*"))
 

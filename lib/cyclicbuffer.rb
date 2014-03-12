@@ -1,4 +1,5 @@
 class CyclicBuffer
+
   def initialize size
     @buffer = Array.new(size, 0)
     @cycling == false
@@ -22,8 +23,33 @@ class CyclicBuffer
     @next += remaining
   end
 
-  def reference pos, length = 1
-    size = @cycling ? @buffer.length : @next
+  def last
+    return nil if @next == 0 && !@cycling
+
+    (@next - 1) % @buffer.length
+  end
+
+  def absolute pos, length = 1
+
+    if pos < 0 || pos >= size || (pos >= @next && !cycling)
+      raise "Pos #{pos} -- invalid absolute position"
+    end
+
+    relative(pos - @next, length)
+  end
+
+  def size
+    @buffer.length
+  end
+
+  alias_method :length, :size
+
+  def number
+    @cycling ? @buffer.length : @next
+  end
+
+  def relative pos, length = 1
+    size = number
     if !(((-size)...(size)) === pos)
       raise "Pos #{pos} -- beyond size of buffer."
     end
@@ -64,38 +90,45 @@ class CyclicBuffer
 end
 
 
-class HashingCyclicBuffer < CyclicBuffer
+class HashingCyclicBuffer
 
-  attr_reader :hash, :factor
+  attr_reader :factor
 
-  def initialize size, factor = 33
-    super(size)
+  Node = Struct.new(:byte, :next, :prev, :next_mmc)
+
+  def initialize size, minmatch, factor = 33
+    @buffer = CyclicBuffer.new(size)
+    @recents = CyclicBuffer.new(minmatch)
+    @minmatch = minmatch
+
+    @dictionary = Hash.new
+
     @factor = factor
-    @maxfactor = factor ** (size-1)
-    @hash = 0
+    @maxfactor = factor ** (hash_len-1)
   end
 
   def write *items
-    if !@cycling || items.length > 1
-      super(*items)
-      _recompute_hash()
-    else
-      @hash -= @buffer[@next] * @maxfactor
-      @hash *= @factor
-      @hash += items[0]
-      super(items[0])
+    items.each do |item|
+
+
+
+      (1..(hash_len-1)).each do |i|
+        break if i > @buffer.number
+        _recompute_hash(-i)
+      end
     end
 
   end
 
   private
 
-  def _recompute_hash
-    @hash = 0
-    buff = reference(0, @buffer.length)
-    (0...(buff.length)).each do |i|
-      @hash *= @factor
-      @hash += buff[i]
+  def _compute_hash pos
+    buff = relative(pos, @hash_len)
+    node = buff[0]
+    node.hash = node.byte
+    (1...hash_len).each do |i|
+      node.hash *= @factor
+      node.hash += buff[i].byte
     end
   end
 end
