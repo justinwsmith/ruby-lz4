@@ -29,16 +29,36 @@ class CyclicBuffer
     end
 
     result = []
-    idx = (@next + pos) % size
-    while true
-      remaining = length - result.length
-      available = size - idx
-      if remaining < available
-        break
+    start = (@next + pos) % size
+    available = (pos < 0) ? (-pos) : (size - pos)
+    finish = (start + available) % size
+
+    if finish <= start
+      while true
+        remaining = length - result.length
+        if remaining > available
+          result.push *(@buffer[start...size])
+          result.push *(@buffer[0...finish])
+        elsif remaining > (@buffer.length - start)
+          result.push *(@buffer[start...size])
+          result.push *(@buffer[0, remaining - (@buffer.length - start)])
+          break
+        else
+          result.push *(@buffer[start, remaining])
+          break
+        end
       end
-      result.push *(@buffer[idx, available])
-      idx = 0
+    else
+      while true
+        remaining = length - result.length
+        if remaining > available
+          result.push *(@buffer[start, available])
+        else
+          result.push *(@buffer[start, remaining])
+          break
+        end
+      end
     end
-    result.push *(@buffer[idx, remaining])
+    result
   end
 end
