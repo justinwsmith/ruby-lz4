@@ -62,3 +62,40 @@ class CyclicBuffer
     result
   end
 end
+
+
+class HashingCyclicBuffer < CyclicBuffer
+
+  attr_reader :hash, :factor
+
+  def initialize size, factor = 33
+    super(size)
+    @factor = factor
+    @maxfactor = factor ** (size-1)
+    @hash = 0
+  end
+
+  def write *items
+    if !@cycling || items.length > 1
+      super(*items)
+      _recompute_hash()
+    else
+      @hash -= @buffer[@next] * @maxfactor
+      @hash *= @factor
+      @hash += items[0]
+      super(items[0])
+    end
+
+  end
+
+  private
+
+  def _recompute_hash
+    @hash = 0
+    buff = reference(0, @buffer.length)
+    (0...(buff.length)).each do |i|
+      @hash *= @factor
+      @hash += buff[i]
+    end
+  end
+end

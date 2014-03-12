@@ -26,6 +26,7 @@ module LZ4
       @output = output
     end
 
+    # TODO: ridiculously slow
     def uncompress input
 
       while true
@@ -65,24 +66,19 @@ module LZ4
   end
 
   class LZ4Compress
-    def initialize input, output
-      @input = input
+    def initialize output, buffer_size = 2**12
       @output = output
     end
 
-    def compress str
-      raise "Not implemented"
+    def compress input
+
+
     end
   end
 
-  class LZ4CompressHC
-    def initialize input, output
-      @input = input
-      @output = output
-    end
-
-    def compress str
-      raise "Not implemented"
+  class LZ4CompressHC < LZ4Compress
+    def initialize output
+      super(output, 2**16)
     end
   end
 

@@ -45,13 +45,15 @@ describe LZ4 do
       end
     end
 
+=begin
+# TODO: This test passes, but is ridiculously slow.
     it "should decompress strings" do
       mimes = IO.read('spec/mime.types')
       cmimes = IO.read('spec/mime.types.bin')
 
       LZ4.uncompress(cmimes).should eq(mimes)
     end
-
+=end
   end
 
 end
