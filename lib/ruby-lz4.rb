@@ -86,8 +86,6 @@ module LZ4
     end
   end
 
-
-
 private
 
   def LZ4._compress input, lz4cls

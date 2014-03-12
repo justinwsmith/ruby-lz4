@@ -1,6 +1,6 @@
-# Ruby::Lz4
+# LZ4
 
-TODO: Write a gem description
+A pure Ruby implementation of th LZ4 compression algorithm
 
 ## Installation
 
