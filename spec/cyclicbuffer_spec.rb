@@ -39,4 +39,10 @@ describe CyclicBuffer do
     cb.reference(-2, 5).should eq([2,3,2,3,2])
   end
 
+  it "should repeat when length excedes size" do
+    cb = CyclicBuffer.new 4
+    cb.write 1
+    cb.reference(-1, 5).should eq([1,1,1,1,1])
+  end
+
 end

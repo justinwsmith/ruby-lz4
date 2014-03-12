@@ -40,8 +40,5 @@ class CyclicBuffer
       idx = 0
     end
     result.push *(@buffer[idx, remaining])
-
   end
-
-
 end
