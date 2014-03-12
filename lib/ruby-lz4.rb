@@ -103,7 +103,12 @@ private
 
     lz4 = lz4cls.new output
     lz4.uncompress input
-    output.string
+    result = output.string
+
+    if result.length != length
+      raise "Mismatched length: Data may be corrupt"
+    end
+    result
   end
 
   def LZ4._encode_header length, output

@@ -1,4 +1,6 @@
 require 'bundler/setup'
+require 'yaml'
+YAML::ENGINE.yamler='syck'
 
 Bundler.setup
 

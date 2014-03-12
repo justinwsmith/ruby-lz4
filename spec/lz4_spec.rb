@@ -1,7 +1,5 @@
 require 'spec_helper'
 require 'stringio'
-require 'yaml'
-YAML::ENGINE.yamler='syck'
 
 describe LZ4 do
 
@@ -46,6 +44,14 @@ describe LZ4 do
         LZ4.uncompress(key).should eq(value)
       end
     end
+
+    it "should decompress strings" do
+      mimes = IO.read('spec/mime.types')
+      cmimes = IO.read('spec/mime.types.bin')
+
+      LZ4.uncompress(cmimes).should eq(mimes)
+    end
+
   end
 
 end
