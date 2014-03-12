@@ -68,18 +68,6 @@ module LZ4
   end
 
 
-  class CyclicBuffer
-    def initialize output, size
-      @output = output
-      @buffer = Array.new(size, 0)
-    end
-
-    def write bytes
-      if String === bytes
-        bytes = bytes = bytes.unpack("C*")
-      end
-    end
-  end
 
 private
 
