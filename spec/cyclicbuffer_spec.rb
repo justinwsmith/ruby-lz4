@@ -113,6 +113,7 @@ require 'cyclicbuffer'
 
   end
 end
+
 # Assume this is how it should be computed
 def myhash(ary, factor)
   hash = 0

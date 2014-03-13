@@ -1,7 +1,7 @@
 class CyclicBuffer
 
-  def initialize size
-    @buffer = Array.new(size, 0)
+  def initialize size, fill_val = 0
+    @buffer = Array.new(size, fill_val)
     @cycling == false
     @next = 0
   end
@@ -97,8 +97,8 @@ class HashingCyclicBuffer
   Node = Struct.new(:byte, :next, :prev, :next_mmc)
 
   def initialize size, minmatch, factor = 33
-    @buffer = CyclicBuffer.new(size)
-    @recents = CyclicBuffer.new(minmatch)
+    @buffer = CyclicBuffer.new(size, nil)
+    @recents = CyclicBuffer.new(minmatch, nil)
     @minmatch = minmatch
 
     @dictionary = Hash.new
@@ -107,9 +107,19 @@ class HashingCyclicBuffer
     @maxfactor = factor ** (hash_len-1)
   end
 
-  def write *items
-    items.each do |item|
+  def write *bytes
+    bytes.each do |byte|
+      if @buffer.number == @buffer.size
+        old = @buffer.relative(0)
+        old.prev.next = old.next
+        old.next.prev = old.prev
+        old.next = nil
+        old.prev = nil
+      end
 
+      node = Node.new(byte)
+
+      @recents.write(node)
 
 
       (1..(hash_len-1)).each do |i|
@@ -117,7 +127,6 @@ class HashingCyclicBuffer
         _recompute_hash(-i)
       end
     end
-
   end
 
   private
