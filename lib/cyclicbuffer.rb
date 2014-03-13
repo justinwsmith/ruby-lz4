@@ -101,7 +101,7 @@ class HashingCyclicBuffer
     @recents = CyclicBuffer.new(minmatch, nil)
     @minmatch = minmatch
 
-    @dictionary = Hash.new
+    @dict = Hash.new
 
     @factor = factor
     @maxfactor = factor ** (hash_len-1)
@@ -109,17 +109,31 @@ class HashingCyclicBuffer
 
   def write *bytes
     bytes.each do |byte|
+      node = nil
       if @buffer.number == @buffer.size
-        old = @buffer.relative(0)
-        old.prev.next = old.next
-        old.next.prev = old.prev
-        old.next = nil
-        old.prev = nil
+        nodes = @buffer.relative(0, @minmatch)
+        hash = _compute_hash(nodes)
+        raise "hash not found" unless dict[hash]
+        hn = dict[hash]
+        if hn.next !=
+
+        node = nodes[0]
+        node.prev.next = old.next
+        node.next.prev = old.prev
+        node.next = nil
+        node.prev = nil
+
+      end
+      if @recents.number == @recents.size
+        node = @recents.relative(0)
+        node.byte = byte
+        hash = _compute_hash(@recents.relative(0, @minmatch))
+        if dict[hash]
+      end
+      unless node
+        node = Node.new()
       end
 
-      node = Node.new(byte)
-
-      @recents.write(node)
 
 
       (1..(hash_len-1)).each do |i|
@@ -131,9 +145,8 @@ class HashingCyclicBuffer
 
   private
 
-  def _compute_hash pos
-    buff = relative(pos, @hash_len)
-    node = buff[0]
+  def _compute_hash bytes
+    node = bytes[0]
     node.hash = node.byte
     (1...hash_len).each do |i|
       node.hash *= @factor
