@@ -22,7 +22,7 @@ describe LZ4 do
         #$stderr << "Expected: " << expected.encoding << "\n"
         #result.each_byte.to_a.should eq(expected.each_byte.to_a)
 
-        result.should eq(expected)
+        expect(result).to eq(expected)
       end
     end
   end
@@ -32,7 +32,7 @@ describe LZ4 do
     hash = YAML.load(IO.read 'spec/header.yaml')
     hash.each do |key, value|
       it "should decode value from base 128" do
-        LZ4.send(:_decode_header, StringIO.new(value.pack("C*"))).should eq(key)
+        expect(LZ4.send(:_decode_header, StringIO.new(value.pack("C*")))).to eq(key)
       end
     end
   end
@@ -41,7 +41,7 @@ describe LZ4 do
     hash = YAML.load(IO.read 'spec/uncompress.yaml')
     hash.each do |key, value|
       it "should decompress strings" do
-        LZ4.uncompress(key).should eq(value)
+        expect(LZ4.uncompress(key)).to eq(value)
       end
     end
 

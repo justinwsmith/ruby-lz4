@@ -1,6 +1,6 @@
 require "ruby-lz4/version"
 require 'stringio'
-require 'cyclicbuffer'
+require 'lz4-filebuffer'
 
 module LZ4
 
@@ -19,7 +19,6 @@ module LZ4
   end
 
   class LZ4Uncompress
-    @@states = [:token, :litlen, :lits, :offset, :matchlen]
 
     def initialize output
       @buffer = CyclicBuffer.new(2**16)

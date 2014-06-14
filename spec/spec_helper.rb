@@ -1,6 +1,6 @@
 require 'bundler/setup'
 require 'yaml'
-YAML::ENGINE.yamler='syck'
+YAML::ENGINE.yamler='psych'
 
 Bundler.setup
 
