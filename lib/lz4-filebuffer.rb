@@ -1,4 +1,4 @@
-require 'rollinghash'
+require 'rolling_checksum_reader'
 
 class LZ4FileBuffer
 
