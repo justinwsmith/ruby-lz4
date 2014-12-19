@@ -57,7 +57,30 @@ describe RollingChecksumReader do
       end
       expect(result).to eq(@input)
     end
-
   end
+
+  describe 'empty input' do
+    before do
+      @input = ''
+      @whash = RollingChecksumReader.new StringIO.new(@input.dup)
+    end
+
+    it "getbyte should return a hash for each byte" do
+      @input.length.times do |i|
+        byte = @whash.getbyte do |pos, hash|
+          fail()
+        end
+        expect(byte).to eq(nil)
+      end
+    end
+
+    it "getbyte should return a hash for each byte" do
+      result = @whash.read(@input.length) do |pos, hashes|
+        fail()
+      end
+      expect(result).to eq(nil)
+    end
+  end
+
 
 end

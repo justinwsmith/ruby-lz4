@@ -21,7 +21,7 @@ class RollingChecksumReader
   end
 
   def read length, &callback
-    result = ""
+    result = ''
     pos = @pos
     checksums = []
     length.times do
@@ -34,8 +34,8 @@ class RollingChecksumReader
         break
       end
     end
-    callback.call(pos, checksums) if callback
-    result
+    callback.call(pos, checksums) if callback && result.length > 0
+    result.length > 0 ? result : nil
   end
 
   def getbyte &callback
