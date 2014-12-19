@@ -1,23 +1,37 @@
 require 'spec_helper'
-require 'rollinghash'
+require 'stringio'
+require 'rolling_checksum_reader'
 
+$hashes = []
 
-describe WindowHash do
+describe RollingChecksumReader do
 
-  describe "hash implementation" do
-    before do 
-      @whash = WindowHash.new
-    end
-    
-    it "should initialliy be zero" do
-      expect(@whash.hash).to eq(0)
-    end
+  describe 'normal input' do
 
-    it "should use single byte as its value" do
-      @whash.add_byte(73)
-      expect(@whash.hash).to eq(73)
+    before do
+      @input = 'abcdefzxy'
+      @whash = RollingChecksumReader.new StringIO.new(@input.dup)
     end
 
+    it "getbyte should return a hash for each byte" do
+      @input.length.times do |i|
+        byte = @whash.getbyte do |pos, hash|
+          expect(pos).to eq(i)
+          $hashes << hash
+        end
+        expect(byte).to eq(@input[i].ord)
+      end
+    end
+
+    it "getbyte should return a hash for each byte" do
+      result = @whash.read(@input.length) do |pos, hashes|
+        expect(pos).to eq(0)
+        expect(hashes).to eq($hashes)
+      end
+      expect(result).to eq(@input)
+    end
+
+=begin
     it "should hash using seed" do
       ary = (2*@whash.max_size).times.map { rand(256) }
       (0...@whash.max_size).each { |i| @whash.add_byte(ary[i]) }
@@ -45,7 +59,7 @@ describe WindowHash do
         @whash.add_byte(ary[index])
       end
     end
-
+=end
 
   end
 

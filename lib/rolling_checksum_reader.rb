@@ -9,6 +9,7 @@ class RollingChecksumReader
 
     @pos = 0
     @checksum = 0
+    @window = []
     @max_size.times do
       byte = input.getbyte
       if !byte
@@ -17,7 +18,6 @@ class RollingChecksumReader
       @window << byte
       @checksum = @checksum * @seed + byte
     end
-
   end
 
   def read length, &callback
@@ -25,7 +25,7 @@ class RollingChecksumReader
     pos = @pos
     checksums = []
     length.times do
-      byte = getbyte do |sum|
+      byte = getbyte do |pos, sum|
         checksums.push(sum)
       end
       if byte
@@ -34,7 +34,8 @@ class RollingChecksumReader
         break
       end
     end
-    callback.call(pos, result) if callback
+    callback.call(pos, checksums) if callback
+    result
   end
 
   def getbyte &callback
@@ -43,13 +44,13 @@ class RollingChecksumReader
     end
 
     callback.call(@pos, @checksum)
-    @pos += 1 += 1
+    @pos += 1
     first = @window.shift
     @checksum -= first * @seed ** (@window.length-1)
 
 
     byte = @input.getbyte
-    unless byte
+    if byte
       @window.push byte
     else
       byte = 0
