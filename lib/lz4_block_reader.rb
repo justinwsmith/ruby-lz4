@@ -1,5 +1,6 @@
 require 'tempfile'
 require 'stringio'
+require 'lz4block'
 
 class LZ4BlockReader
   def initialize input, default_threshold=64
@@ -33,7 +34,7 @@ class LZ4BlockReader
       literals_dest = StringIO.new()
     end
     while lr > 0
-      lits = @input.read([lits_remaining, 2**16].min)
+      lits = @input.read([lr, 2**16].min)
       if lits
         literals_dest.write(lits)
         lr -= lits.length
@@ -47,6 +48,10 @@ class LZ4BlockReader
     literals_dest.flush
     literals_dest.rewind
     bytes_read += ll
+
+    if @input.eof?
+      return LZ4Block.new(ll, literals_dest, nil, nil, bytes_read)
+    end
 
     mo = @input.readbyte
     mo |= @input.readbyte * 256

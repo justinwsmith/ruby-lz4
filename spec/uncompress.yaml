@@ -1,18 +1,23 @@
---- 
-"\f\xC0Hello World!": Hello World!
-"\x04@aaaa": aaaa
-"\x05Paaaaa": aaaaa
-"\x06`aaaaaa": aaaaaa
-"\apaaaaaaa": aaaaaaa
-"\b\x80aaaaaaaa": aaaaaaaa
-"\f\xC0aaaaaaaaaaaa": aaaaaaaaaaaa
-? !binary "Hx9hAQAGUGFhYWFh\n"
-: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+---
+# require 'base64'
+# Base64.encode64(x)
+# x = "\xC0Hello World!".force_encoding('ASCII-8BIT')
+!binary "wEhlbGxvIFdvcmxkIQ": "Hello World!"
+# x = "\xF0\x03Hello World!World!".force_encoding('ASCII-8BIT')
+!binary "8ANIZWxsbyBXb3JsZCFXb3JsZCE=": "Hello World!World!"
+#"\x04@aaaa": aaaa
+#"\x05Paaaaa": aaaaa
+#"\x06`aaaaaa": aaaaaa
+#"\apaaaaaaa": aaaaaaa
+#"\x80aaaaaaaa": aaaaaaaa
+#"\xC0aaaaaaaaaaaa": aaaaaaaaaaaa
+#? !binary "Hx9hAQAGUGFhYWFh\n"
+#: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
-? !binary "IR9hAQAIUGFhYWFh\n"
-: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+#? !binary "IR9hAQAIUGFhYWFh\n"
+#: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
-? !binary "DxVhAQBQYWFhYWE=\n"
-: aaaaaaaaaaaaaaa
+#? !binary "DxVhAQBQYWFhYWE=\n"
+#: aaaaaaaaaaaaaaa
 
-"\r\xD0aaaaaaaaaaaaa": aaaaaaaaaaaaa
+#"\r\xD0aaaaaaaaaaaaa": aaaaaaaaaaaaa

@@ -2,8 +2,7 @@ require 'spec_helper'
 require 'stringio'
 
 describe LZ4 do
-
-  describe "_encode_header" do
+  describe "encode_header" do
     hash = YAML.load(IO.read 'spec/header.yaml')
     hash.each do |key, value|
       it "should encode value in base 128" do

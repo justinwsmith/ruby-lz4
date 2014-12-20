@@ -6,7 +6,6 @@ $normal_hashes = []
 $short_hashes = []
 
 describe RollingChecksumReader do
-
   describe 'normal input' do
 
     before do
@@ -81,6 +80,4 @@ describe RollingChecksumReader do
       expect(result).to eq(nil)
     end
   end
-
-
 end
