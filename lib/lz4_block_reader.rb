@@ -13,7 +13,7 @@ class LZ4BlockReader
     bytes_read = 1
 
     ll = token >> 4
-    ml = token % 16
+    ml = token % 16 + 4
 
     if ll == 15
       while true

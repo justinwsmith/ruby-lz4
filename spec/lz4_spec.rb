@@ -37,7 +37,7 @@ describe LZ4 do
   end
 
   describe "uncompress" do
-    hash = YAML.load(IO.read 'spec/uncompress.yaml')
+    hash = YAML.load(IO.read 'spec/literals.yaml')
     hash.each do |key, value|
       it "should decompress strings" do
         expect(LZ4.uncompress(key)).to eq(value)

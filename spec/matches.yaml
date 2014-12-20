@@ -1,0 +1,5 @@
+---
+# require 'base64'
+# Base64.encode64(x)
+# x = "\xC1Hello World!\x06\x00"".force_encoding('ASCII-8BIT')
+!binary "wUhlbGxvIFdvcmxkIQYA\n": ["Hello World!", 5, 6]
