@@ -1,4 +1,4 @@
-require 'rolling_checksum_reader'
+require 'rolling_checksum_byte_processor'
 
 class LZ4FileBuffer
 
@@ -46,10 +46,10 @@ class LZ4FileBuffer
   end
 
   def getbyte offset
-    if offset < @window.max_size
+    if offset < @window.window_max
       return @window[offset]
-    elsif offset >= (@lookahead.size+@window.max_size)
-      while offset >= (@lookahead.size + @window.max_size)
+    elsif offset >= (@lookahead.size+@window.window_max)
+      while offset >= (@lookahead.size + @window.window_max)
         return nil unless load_lookahead
       end
     end
@@ -58,7 +58,7 @@ class LZ4FileBuffer
   end 
 
   def window_size
-    @window.max_size
+    @window.window_max
   end
 
   def hash_seed
