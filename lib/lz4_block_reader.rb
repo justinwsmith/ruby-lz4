@@ -32,6 +32,7 @@ class LZ4BlockReader
       literals_dest = Tempfile.new("ruby-lz4", :encoding => 'ascii-8bit')
     else
       literals_dest = StringIO.new()
+      literals_dest.set_encoding('ASCII-8BIT')
     end
     while lr > 0
       lits = @input.read([lr, 2**16].min)

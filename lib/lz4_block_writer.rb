@@ -9,7 +9,7 @@ class LZ4BlockWriter
 
   def write_block lz4block
     ll = lz4block.literals_len
-    ml = lz4block.match_len - 4
+    ml = (lz4block.match_len || 4) - 4
 
     if ll >= 15
       token = 15
@@ -57,8 +57,14 @@ class LZ4BlockWriter
     @bytes_written += lz4block.literals_len
 
     # little-endian
-    @output.putc(@match_off % 256)
-    @output.putc(@match_off >> 8)
+    mo = lz4block.match_off
+    if mo
+      @output.putc(mo % 256)
+      @output.putc(mo >> 8)
+    else
+      @output.putc 0
+      @output.putc 0
+    end
     @bytes_written += 2
 
     while ml >= 0
@@ -72,5 +78,9 @@ class LZ4BlockWriter
         break
       end
     end
+  end
+
+  def flush
+    @output.flush
   end
 end
