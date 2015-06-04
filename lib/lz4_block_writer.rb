@@ -7,7 +7,7 @@ class LZ4BlockWriter
     @bytes_written = 0
   end
 
-  def write_block lz4block
+  def write_block lz4block, &lit_callback
     ll = lz4block.literals_len
     ml = (lz4block.match_len || 4) - 4
 
@@ -41,9 +41,8 @@ class LZ4BlockWriter
     end
 
     lits_remaining = lz4block.literals_len
-    lsrc = lz4block.literals_src
     while lits_remaining > 0
-      lits = lsrc.read([lits_remaining, 2**16].min)
+      lits = lit_callback.call lits_remaining
       if lits
         @output.write(lits)
         lits_remaining -= lits.length

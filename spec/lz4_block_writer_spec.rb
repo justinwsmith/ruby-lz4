@@ -13,7 +13,10 @@ describe 'LZ4BlockWriter' do
         dest = StringIO.new
         dest.set_encoding('ASCII-8BIT')
         writer = LZ4BlockWriter.new(dest)
-        writer.write_block(LZ4Block.new(literal.size, StringIO.new(literal), ml, mo))
+        writer.write_block(LZ4Block.new(literal.size, ml, mo)) do |lits_remaining|
+          raise "#{lits_remaining} != #{literal.length}" if lits_remaining != literal.length
+          literal
+        end
         writer.flush
         result = dest.string
         puts "Output: #{result.inspect}"
