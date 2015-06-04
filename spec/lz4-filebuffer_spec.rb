@@ -1,6 +1,5 @@
 require 'spec_helper'
 require 'lz4-filebuffer'
-
 require 'stringio'
 
 FILE = 'data/lz4-google-code.html'

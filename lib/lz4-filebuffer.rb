@@ -23,7 +23,7 @@ class LZ4FileBuffer
     return false unless byte
 
     [byte, hash]
-	end
+  end
 
   def load_window
     if @lookahead.length == 0

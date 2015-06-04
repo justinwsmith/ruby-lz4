@@ -1,5 +1,4 @@
 require 'tempfile'
-require 'stringio'
 require 'lz4block'
 
 class LZ4BlockReader
@@ -8,7 +7,7 @@ class LZ4BlockReader
     @default_threshold = default_threshold
   end
 
-  def read_block threshold=nil
+  def read_block &lit_callback
     token = @input.readbyte
     bytes_read = 1
 
@@ -28,48 +27,40 @@ class LZ4BlockReader
     end
 
     lr = ll
-    if lr > (threshold || @default_threshold)
-      literals_dest = Tempfile.new("ruby-lz4", :encoding => 'ascii-8bit')
-    else
-      literals_dest = StringIO.new()
-      literals_dest.set_encoding('ASCII-8BIT')
-    end
     while lr > 0
       lits = @input.read([lr, 2**16].min)
       if lits
-        literals_dest.write(lits)
-        lr -= lits.length
+        lit_callback and lit_callback.call(lits)
+        lr -= lits.size
       else
         if lr > 0
-          raise "Unable to read literals. Remaining: #{lits_remaining}"
+          raise "Unable to read literals. Remaining: #{lr}"
         end
         break
       end
     end
-    literals_dest.flush
-    literals_dest.rewind
     bytes_read += ll
 
     if @input.eof?
-      return LZ4Block.new(ll, literals_dest, nil, nil, bytes_read)
-    end
+      LZ4Block.new(ll, nil, nil, bytes_read)
+    else
+      mo = @input.readbyte
+      mo |= @input.readbyte * 256
+      bytes_read +=2
 
-    mo = @input.readbyte
-    mo |= @input.readbyte * 256
-    bytes_read +=2
+      if ml == 15
+        while true
+          byte = @input.readbyte
+          bytes_read += 1
 
-    if ml == 15
-      while true
-        byte = @input.readbyte
-        bytes_read += 1
-
-        ml += byte
-        if byte < 255
-          break
+          ml += byte
+          if byte < 255
+            break
+          end
         end
       end
-    end
 
-    LZ4Block.new(ll, literals_dest, ml, mo, bytes_read)
+      LZ4Block.new(ll, ml, mo, bytes_read)
+    end
   end
 end
